@@ -22,22 +22,16 @@ import java.util.Set;
 public class AdminController {
 
     private final ServiceInt userService;
-    private final RoleServiceInt roleService;
 
     @Autowired
     public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
-        this.roleService = roleService;
     }
 
     @GetMapping
     public String index(ModelMap model, Principal principal) {
         List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
-
-        Set<Role> roles = new HashSet<>();
-        roles.addAll(roleService.getAllRoles());
-        model.addAttribute("roles", roles);
 
         if (principal != null) {
             User user = userService.getUserByName(principal.getName());
@@ -47,47 +41,10 @@ public class AdminController {
         return "admin";
     }
 
-
-    @PostMapping("/create")
-    @Transactional
-    public String createUser(@RequestParam String name,
-                             @RequestParam String email,
-                             @RequestParam(required = false) String password,
-                             @RequestParam List<Long> roles) {
-
-
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setPassword(password);
-
-        // Установите роли
-        Set<Role> selectedRoles = new HashSet<>();
-        for (Long roleId : roles) {
-            Role role = roleService.getRoleById(roleId);
-            selectedRoles.add(role);
-        }
-        user.setRoles(selectedRoles); // Установите роли пользователю
-
-        userService.insertUser(user);
-        return "redirect:/admin"; // Перенаправление на список пользователей
+    @GetMapping("/admin")
+    public String adminPage(ModelMap model, Principal principal) {
+        User user = userService.getUserByName(principal.getName());
+        model.addAttribute("loggedInAdmin", user);
+        return "admin"; // имя вашего шаблона
     }
-
-    @PostMapping("/edit")
-    public String updateUser(@RequestParam String name,
-                             @RequestParam String email,
-                             @RequestParam(required = false) String password, // Пароль будет необязательным
-                             @RequestParam Set<Role> roles,
-                             @RequestParam Long id) {
-        userService.updateUser(name, email, password, roles, id);
-        return "redirect:/admin";
-    }
-
-    @PostMapping("/delete/{id}")
-    @Transactional
-    public String deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id); // Измененный вызов
-        return "redirect:/admin"; // Перенаправление после удаления
-    }
-
 }

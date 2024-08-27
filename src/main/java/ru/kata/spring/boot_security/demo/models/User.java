@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.models;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,9 +25,6 @@ public class User implements UserDetails {
     private String email;
 
     private String password;
-
-    @Transient
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @ManyToMany
     @JoinTable(
@@ -96,7 +94,7 @@ public class User implements UserDetails {
     }
 
     public void setPassword(String password) {
-        this.password = passwordEncoder.encode(password);
+        this.password = password;
     }
 
     public Set<Role> getRoles() {

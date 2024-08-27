@@ -1,9 +1,12 @@
 package ru.kata.spring.boot_security.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.models.Role;
@@ -17,14 +20,18 @@ import java.util.Set;
 public class UserService implements ServiceInt, UserDetailsService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
+    //не понимаю, почему без ленивой загрузки не хочет работать
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,@Lazy PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional // Обработка транзакции при вставке
     public void insertUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -49,7 +56,7 @@ public class UserService implements ServiceInt, UserDetailsService {
         User userToUpdate = userRepository.findByIdWithRoles(id);
         userToUpdate.setName(name);
         userToUpdate.setEmail(email);
-        userToUpdate.setPassword(password);
+        userToUpdate.setPassword(passwordEncoder.encode(password));
         userToUpdate.setRoles(roles);
         userRepository.save(userToUpdate);
     }
