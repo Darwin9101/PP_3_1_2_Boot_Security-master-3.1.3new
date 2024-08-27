@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin panel</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+</head>
+<body style="background-color: #f2f2f2">
+<header class="bg-dark text-white p-3 h4">
+    <span th:text="${loggedInAdmin.email}" class="font-weight-bold"></span>
+    <span class="font-weight-light">with roles:</span>
+    <span th:text="${loggedInAdmin.roles}" class="font-weight-light"></span>
+
+    <a href="/logout" class="text-white-50 bg-dark float-right">Logout</a>
+</header>
+<div>
+    <div class="row">
+        <div class="p-0 pl-3 bg-white" style="width: 300px">
+            <nav class="nav flex-column">
+                <a class="d-block p-3 bg-primary text-white" href="/admin">Admin</a>
+                <a class="d-block p-3" href="/user">User</a>
+            </nav>
+        </div>
+        <div class="container mt-4">
+            <h1 class="pb-3">Admin panel</h1>
+            <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addUserModal">
+                New User
+            </button>
+
+            <table class="table mt-3 bg-white">
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Роль</th>
+                    <th scope="col">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${users}">
+                    <td th:text="${a.id}"></td>
+                    <td th:text="${a.name}"></td>
+                    <td th:text="${a.email}"></td>
+                    <td th:text="${a.roles}"></td>
+                    <td>
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editUserModal"
+                                th:attr="data-id=${a.id}, data-name=${a.name}, data-email=${a.email}, data-password=${a.password}">
+                            Edit
+                        </button>
+                        <form th:action="@{/admin/delete/{id}(id=${a.id})}" method="post" style="display:inline;">
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для добавления пользователя -->
+<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Добавить пользователя</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/admin/create}" method="post">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" name="name" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" name="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" name="password" id="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Роли</label>
+                        <select multiple name="roles" class="form-control">
+                            <option th:each="role : ${roles}"
+                                    th:value="${role.id}" th:text="${role.name}"></option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary float-right">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для редактирования пользователя -->
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Редактировать пользователя</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/admin/edit}" method="post">
+                    <input type="hidden" name="id" id="editUserId">
+                    <div class="form-group">
+                        <label for="editName">Name</label>
+                        <input type="text" class="form-control" name="name" id="editName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" class="form-control" name="email" id="editEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPassword">Password</label>
+                        <input type="password" class="form-control" name="password" id="editPassword">
+                    </div>
+                    <div class="form-group">
+                        <label>Роли</label>
+                        <select multiple name="roles" class="form-control">
+                            <option th:each="role : ${roles}"
+                                    th:value="${role.id}" th:text="${role.name}"></option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary float-right">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+<script>
+    $('#editUserModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var userId = button.data('id');
+        var userName = button.data('name');
+        var userEmail = button.data('email');
+
+        var modal = $(this);
+        modal.find('.modal-body #editUserId').val(userId);
+        modal.find('.modal-body #editName').val(userName);
+        modal.find('.modal-body #editEmail').val(userEmail);
+    });
+</script>
+
+</body>
+</html>

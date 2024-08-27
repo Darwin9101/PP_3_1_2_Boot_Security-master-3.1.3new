@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+
+    <title>Пользователь</title>
+</head>
+
+<body style="background-color: #f2f2f2">
+<header class="bg-dark text-white p-3 h4">
+    <span th:text="${user.email}" class="font-weight-bold"></span>
+    <span class="font-weight-light">with roles:</span>
+    <span th:text="${user.roles}" class="font-weight-light"></span>
+
+    <a href="/logout" class="text-white-50 bg-dark float-right">Logout</a>
+</header>
+
+<div>
+    <div class="row">
+
+        <div class="p-0 pl-3 bg-white" style="width: 300px">
+            <nav class="nav flex-column">
+                <div th:if="${user.roles.contains('ROLE_ADMIN')}">
+                    <!-- Я правда не знаю почему:
+                         sec:authorize="hasRole('ROLE_ADMIN')" (ничего не делает)
+                         th:if="${user.roles.contains('ROLE_ADMIN')}" (ссылку не видно у админа)
+                    -->
+                    <a class="d-block p-3" href="/admin">Admin</a>
+                </div>
+                <a class="d-block p-3 bg-primary text-white" href="/user">User</a>
+            </nav>
+        </div>
+
+        <div class="col">
+            <h1 class="pb-3">
+                User information-page
+            </h1>
+            <div
+                    style="height: 50px;
+                    width: 1200px;
+                    background-color: white;
+                     display: flex;
+                     align-items: center;
+                     justify-content: space-between;
+                     padding: 10px">
+
+                <span class="font-weight-bold">About User</span>
+
+            </div>
+            <table class="table bg-white" style="width: 1200px">
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Роль</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.name}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td th:text="${user.roles}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+</html>
